@@ -103,6 +103,7 @@ module.exports = class PetShopOrder extends Order{
         </script>
         Thank you ${this.sNumber} for your order of $${this.sPrice}.
         <div id="paypal-button-container"></div>
+        <script src="/js/order.js" type="module"></script>
   
         <script>
           paypal.Buttons({
@@ -121,8 +122,8 @@ module.exports = class PetShopOrder extends Order{
                 return actions.order.capture().then(function(details) {
                   // This function shows a transaction success message to your buyer.
                   $.post(".",details,()=>{
-                    window.open("", "_self");
-                    window.close(); 
+                    window.saveOrderOnline(details,${JSON.stringify(this)});
+                    
                   });
                 });
               }
