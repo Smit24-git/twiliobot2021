@@ -25,17 +25,33 @@ module.exports = class PetShopOrder extends Order{
                 this.stateCur = OrderState.FOOD;
                 aReturn.push("Welcome to Smit's Pet Shop.");
                 aReturn.push("What pet food you want to purchase? <br/>( cat food | dog food | fish food )");
+                
                 break;
             case OrderState.FOOD:
-                this.stateCur = OrderState.GROOMING_PRODUCT
                 this.sPetFood = sInput;
-                aReturn.push("What Grooming Product would you like for your pet?");
-                this.sPrice+=10;
+    
+                if(this.sPetFood.toLowerCase()=='cat food') this.sPrice+=10;
+                else if(this.sPetFood.toLowerCase()=='dog food') this.sPrice+=12;
+                else if(this.sPetFood.toLowerCase()=='fish food') this.sPrice+=14;
+                else{
+                  aReturn.push("Please Choose One of these: cat food | dog food | fish food");
+                  break;
+                }
+                this.stateCur = OrderState.GROOMING_PRODUCT;
+                aReturn.push("What Grooming Product would you like for your pet? <br/> ( brushes | combs | shampoo )");
                 break;
             case OrderState.GROOMING_PRODUCT:
-                this.stateCur = OrderState.TOYS
                 this.sGroomingProduct = sInput;
-                aReturn.push("Would you like Toys with that?");
+                if(this.sGroomingProduct.toLowerCase()=='brushes') this.sPrice+=15;
+                else if(this.sGroomingProduct.toLowerCase()=='combs') this.sPrice+=14;
+                else if(this.sGroomingProduct.toLowerCase()=='shampoo') this.sPrice+=20;
+                else{
+                  aReturn.push("Please Choose One of these: brushes | combs | shampoo");
+                  break;
+                }
+                this.stateCur = OrderState.TOYS;
+                aReturn.push("Would you like Toys with that? <br/> (yes | no)");
+
                 this.sPrice+=15;
                 break;
             case OrderState.TOYS://final stage
@@ -61,6 +77,10 @@ module.exports = class PetShopOrder extends Order{
                 let d = new Date(); 
                 d.setMinutes(d.getMinutes() + 20);
                 aReturn.push(`Your order will be delivered at ${d.toTimeString()}`);
+                const shipping_details=sInput.purchase_units[0].shipping;
+
+                aReturn.push('Name: '+shipping_details.name.full_name);
+                aReturn.push('Address: '+Object.values(shipping_details.address).join());
                 break;
         }
         return aReturn;
@@ -100,7 +120,7 @@ module.exports = class PetShopOrder extends Order{
                 // This function captures the funds from the transaction.
                 return actions.order.capture().then(function(details) {
                   // This function shows a transaction success message to your buyer.
-                  $.post(".",()=>{
+                  $.post(".",details,()=>{
                     window.open("", "_self");
                     window.close(); 
                   });
